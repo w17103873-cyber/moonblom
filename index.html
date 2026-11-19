@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moonbloom — a language I made up</title>
+<style>
+  /* ===== COLOURS — change these and the whole page changes ===== */
+  :root {
+    --bg: #0d1224;        /* background */
+    --bg-soft: #151c35;   /* cards */
+    --text: #e6e9f5;      /* main text */
+    --muted: #9aa3c0;     /* dimmer text */
+    --silver: #c9d3e8;    /* moonlight */
+    --gold: #e8c97a;      /* accent */
+    --line: #26304f;      /* borders */
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: radial-gradient(circle at 50% -10%, #1b2547 0%, var(--bg) 55%);
+    color: var(--text);
+    font-family: Georgia, 'Times New Roman', serif;
+    line-height: 1.65;
+  }
+
+  /* ===== NAVIGATION ===== */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(13, 18, 36, 0.92);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 20px;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    font-size: 14px;
+  }
+  nav a {
+    color: var(--silver);
+    text-decoration: none;
+    margin: 0 8px;
+    white-space: nowrap;
+  }
+  nav a:hover { color: var(--gold); }
+
+  /* ===== LAYOUT ===== */
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+  section { padding-top: 56px; }
+
+  h1 {
+    font-size: clamp(32px, 6vw, 52px);
+    margin: 40px 0 8px;
+    color: var(--silver);
+    text-shadow: 0 0 24px rgba(201, 211, 232, 0.25);
+  }
+  h2 {
+    font-size: 26px;
+    color: var(--gold);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+  }
+  h3 { font-size: 19px; color: var(--silver); margin-bottom: 4px; }
+  p { margin: 10px 0; }
+  .muted { color: var(--muted); }
+
+  /* ===== HERO ===== */
+  .hero { text-align: center; padding-top: 40px; }
+  .hero p { max-width: 620px; margin: 12px auto; }
+  .note {
+    display: inline-block;
+    margin-top: 18px;
+    padding: 12px 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg-soft);
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  /* ===== CARDS ===== */
+  .card {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin: 14px 0;
+  }
+  .card:hover { border-color: #3a4670; }
+  .card .example {
+    font-family: system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--gold);
+    margin-top: 6px;
+  }
+
+  /* ===== ALPHABET TILES ===== */
+  .alphabet { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .alphabet span {
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 20px;
+    color: var(--silver);
+  }
+
+  /* ===== SEARCH ===== */
+  .search {
+    width: 100%;
+    padding: 12px 16px;
+    margin: 8px 0 20px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 16px;
+    font-family: system-ui, sans-serif;
+  }
+  .search:focus { outline: none; border-color: var(--gold); }
+
+  /* ===== TABLES ===== */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 26px; font-size: 16px; }
+  th {
+    text-align: left;
+    font-family: system-ui, sans-serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--line);
+    padding: 8px 6px;
+  }
+  td { padding: 8px 6px; border-bottom: 1px solid #1d2542; vertical-align: top; }
+  td:first-child { color: var(--gold); font-style: italic; white-space: nowrap; }
+  tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+  /* ===== RACE GRID ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .grid div {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+  .grid b { color: var(--gold); font-style: italic; display: block; }
+
+  /* ===== BATTLE CRIES ===== */
+  .cry { margin: 12px 0; }
+  .cry b { color: var(--silver); font-size: 18px; letter-spacing: 0.03em; }
+  .cry span { display: block; color: var(--muted); font-size: 15px; }
+  .cry.signature {
+    border: 1px solid var(--gold);
+    border-radius: 12px;
+    padding: 14px 18px;
+    background: rgba(232, 201, 122, 0.06);
+  }
+  .cry.signature b { color: var(--gold); }
+
+  /* ===== CODE BLOCKS ===== */
+  pre {
+    background: #0a0f1e;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #cdd6ee;
+  }
+  code { font-family: ui-monospace, Consolas, monospace; }
+
+  footer {
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#hello">Hello</a>
+  <a href="#sound">Sound</a>
+  <a href="#alphabet">Alphabet</a>
+  <a href="#grammar">Grammar</a>
+  <a href="#words">Words</a>
+  <a href="#races">Races</a>
+  <a href="#cries">Battle cries</a>
+  <a href="#swearing">Swearing</a>
+  <a href="#sentences">Sentences</a>
+  </nav>
+
+<main>
+
+  <!-- ===== HERO ===== -->
+  <section id="hello" class="hero">
+    <h1>Moonbloom</h1>
+    <p class="muted">a language I made up</p>
+    <p>Hi, I'm Vix. I made up a language, and this is where I keep it.</p>
+    <p>Moonbloom is the name of the kingdom, not the language. The language itself is called <i>lunari</i> — from the word for "living".</p>
+    <p class="note">English isn't my first language, so please excuse any mistakes — I'm still learning.</p>
+  </section>
+
+  <!-- ===== HOW IT SOUNDS ===== -->
+  <section id="sound">
+    <h2>How it sounds</h2>
+    <p>Spoken normally, it sounds calm and beautiful. Shouted, it sounds genuinely unsettling — the hard <b>k</b>, <b>t</b> and <b>r</b> come out sharp, and suddenly it's something you want to run from.</p>
+    <div class="card">
+      <div class="example">NE! NE FEN! DRAKIN IN HEIM!</div>
+      <p class="muted">No! Don't go! Dragons in the house!</p>
+    </div>
+  </section>
+
+  <!-- ===== ALPHABET ===== -->
+  <section id="alphabet">
+    <h2>Alphabet</h2>
+    <div class="alphabet">
+      <span>a</span><span>b</span><span>d</span><span>e</span><span>f</span><span>g</span>
+      <span>h</span><span>i</span><span>j</span><span>k</span><span>l</span><span>m</span>
+      <span>n</span><span>o</span><span>ó</span><span>u</span><span>p</span><span>r</span>
+      <span>s</span><span>t</span><span>v</span><span>y</span><span>æ</span><span>z</span>
+      <span>ö</span><span>ä</span><span>å</span>
+    </div>
+  </section>
+
+  <!-- ===== GRAMMAR ===== -->
+  <section id="grammar">
+    <h2>Grammar</h2>
+
+    <div class="card">
+      <h3>Pronouns</h3>
+      <p><i>mi</i> = I · <i>ti</i> = you · <i>sa</i> = he / she / it · <i>min</i> = we · <i>tin</i> = you (plural) · <i>san</i> = they</p>
+    </div>
+
+    <div class="card">
+      <h3>"es" = to be</h3>
+      <p>It never changes, no matter who it's about.</p>
+      <div class="example">Mi es Vix. — I am Vix.</div>
+    </div>
+
+    <div class="card">
+      <h3>Tense is glued onto the verb</h3>
+      <p>Verbs never conjugate. <b>-ta</b> makes the past, <b>-va</b> makes the future. Present tense has no ending.</p>
+      <div class="example">amita = loved · veyva = will see · min talta = we spoke</div>
+    </div>
+
+    <div class="card">
+      <h3>Negation</h3>
+      <p><i>ne</i> goes before the verb.</p>
+      <div class="example">Mi ne vey. — I don't see.</div>
+    </div>
+
+    <div class="card">
+      <h3>Questions</h3>
+      <p>Start the sentence with <i>ka</i>.</p>
+      <div class="example">Ka ti tal Moonbloom? — Do you speak Moonbloom?</div>
+    </div>
+
+    <div class="card">
+      <h3>Plural</h3>
+      <p>Add <b>-in</b> to the noun.</p>
+      <div class="example">drak → drakin (dragons) · miza → mizain · vina → vinain</div>
+    </div>
+
+    <div class="card">
+      <h3>Word order</h3>
+      <p>Subject → verb → everything else.</p>
+      <div class="example">Mi ta vey drak in skog. — I saw a dragon in the forest.</div>
+    </div>
+
+    <div class="card">
+      <h3>Adjectives come after the noun</h3>
+      <p>The describing word goes second, never first.</p>
+      <div class="example">hjer varm = warm heart · stal kald = cold steel · drak mör = a big dragon</div>
+    </div>
+
+    <div class="card">
+      <h3>Possessives come after the noun too</h3>
+      <p>Who it belongs to goes after the thing, not before it.</p>
+      <div class="example">heim mi = my house · ami ti = your love · drak san = their dragon</div>
+    </div>
+
+    <div class="card">
+      <h3>The possessive words</h3>
+      <p><i>mi</i> = my · <i>ti</i> = your · <i>sa</i> = his / her · <i>min</i> = our · <i>tin</i> = your (plural) · <i>san</i> = their</p>
+      <div class="example">Heim mi es mör. — My house is big.</div>
+    </div>
+<div class="card">
+      <h3>Conjunctions</h3>
+      <p><i>ve</i> = and · <i>te</i> = but · <i>rez</i> = or</p>
+      <div class="example">Mi ve ti. — Me and you.</div>
+      <div class="example">Sa es mör, te hjer sa es varm. — He is big, but his heart is warm.</div>
+      <div class="example">Ka ti mjn vatr rez fyra? — Do you want water or fire?</div>
+    </div>
+  </section>
+
+  <!-- ===== VOCABULARY ===== -->
+ <input class="search" id="search" type="text" placeholder="Search a word…">
+    <h3>Grammar words</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>mi</td><td>I / my</td><td></td></tr>
+      <tr><td>ti</td><td>you / your</td><td></td></tr>
+      <tr><td>sa</td><td>he, she, it / his, her</td><td></td></tr>
+      <tr><td>min</td><td>we / our</td><td></td></tr>
+      <tr><td>tin</td><td>you (plural) / your</td><td></td></tr>
+      <tr><td>san</td><td>they / their</td><td></td></tr>
+      <tr><td>es</td><td>to be</td><td>never conjugated</td></tr>
+      <tr><td>ne</td><td>not</td><td>before the verb</td></tr>
+      <tr><td>ka</td><td>question marker</td><td>starts the sentence</td></tr>
+      <tr><td>ve</td><td>and</td><td></td></tr>
+      <tr><td>te</td><td>but</td><td></td></tr>
+      <tr><td>rez</td><td>or</td><td></td></tr>
+    </table>
+
+    <h3>Nature &amp; world</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>lun</td><td>moon</td><td></td></tr>
+      <tr><td>stjar</td><td>star</td><td></td></tr>
+      <tr><td>sal</td><td>sun</td><td></td></tr>
+      <tr><td>fyra</td><td>fire</td><td></td></tr>
+      <tr><td>vetr</td><td>earth, ground</td><td></td></tr>
+      <tr><td>vatr</td><td>water</td><td></td></tr>
+      <tr><td>vina</td><td>wind</td><td></td></tr>
+      <tr><td>skog</td><td>forest</td><td></td></tr>
+      <tr><td>blom</td><td>flower</td><td></td></tr>
+      <tr><td>heim</td><td>home, house</td><td></td></tr>
+      <tr><td>natt</td><td>night</td><td></td></tr>
+      <tr><td>dag</td><td>day</td><td></td></tr>
+      <tr><td>ljus</td><td>light / bright</td><td></td></tr>
+      <tr><td>drak</td><td>dragon</td><td>an animal, not a race</td></tr>
+      <tr><td>miza</td><td>cat</td><td></td></tr>
+      <tr><td>fugl</td><td>bird</td><td></td></tr>
+      <tr><td>ulv</td><td>wolf</td><td></td></tr>
+      <tr><td>lunari</td><td>living being</td><td>plural: lunarin</td></tr>
+      <tr><td>stelari</td><td>thing</td><td>an insult, to her</td></tr>
+    </table>
+
+    <h3>Verbs</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>vey</td><td>see</td><td>veyta = saw, veyva = will see</td></tr>
+      <tr><td>ami</td><td>love</td><td>amita = loved</td></tr>
+      <tr><td>runa</td><td>live, dwell</td><td></td></tr>
+      <tr><td>tal</td><td>speak</td><td></td></tr>
+      <tr><td>mjn</td><td>want</td><td></td></tr>
+      <tr><td>fen</td><td>go</td><td></td></tr>
+      <tr><td>sova</td><td>know</td><td></td></tr>
+      <tr><td>rör</td><td>move, touch</td><td></td></tr>
+      <tr><td>driv</td><td>drive, chase</td><td></td></tr>
+      <tr><td>dräp</td><td>kill</td><td></td></tr>
+      <tr><td>vis</td><td>show</td><td></td></tr>
+      <tr><td>smak</td><td>taste</td><td></td></tr>
+      <tr><td>jaga</td><td>hunt</td><td></td></tr>
+      <tr><td>dö</td><td>die</td><td></td></tr>
+      <tr><td>lev</td><td>live</td><td></td></tr>
+    </table>
+
+    <h3>Adjectives</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>lyr</td><td>beautiful</td><td></td></tr>
+      <tr><td>mör</td><td>big</td><td></td></tr>
+      <tr><td>lit</td><td>small</td><td></td></tr>
+      <tr><td>kald</td><td>cold</td><td></td></tr>
+      <tr><td>varm</td><td>warm</td><td></td></tr>
+      <tr><td>god</td><td>good</td><td></td></tr>
+      <tr><td>ond</td><td>bad, evil</td><td></td></tr>
+      <tr><td>ung</td><td>young</td><td></td></tr>
+      <tr><td>gammal</td><td>old</td><td></td></tr>
+      <tr><td>sann</td><td>true</td><td></td></tr>
+      <tr><td>mörkr</td><td>dark</td><td>mörkrgrön = dark green</td></tr>
+    </table>
+
+    <h3>Prepositions</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>in</td><td>in</td><td></td></tr>
+      <tr><td>til</td><td>to</td><td></td></tr>
+      <tr><td>fra</td><td>from</td><td></td></tr>
+      <tr><td>ov</td><td>on, above</td><td></td></tr>
+      <tr><td>und</td><td>under</td><td></td></tr>
+      <tr><td>med</td><td>with</td><td></td></tr>
+      <tr><td>for</td><td>for</td><td></td></tr>
+      <tr><td>efter</td><td>after</td><td></td></tr>
+    </table>
+
+    <h3>Numbers</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>en</td><td>1</td><td></td></tr>
+      <tr><td>tu</td><td>2</td><td></td></tr>
+      <tr><td>tri</td><td>3</td><td></td></tr>
+      <tr><td>fyr</td><td>4</td><td></td></tr>
+      <tr><td>fem</td><td>5</td><td></td></tr>
+      <tr><td>sek</td><td>6</td><td></td></tr>
+      <tr><td>sju</td><td>7</td><td></td></tr>
+      <tr><td>att</td><td>8</td><td></td></tr>
+      <tr><td>ni</td><td>9</td><td></td></tr>
+      <tr><td>ti</td><td>10</td><td></td></tr>
+      <tr><td>hund</td><td>100</td><td></td></tr>
+    </table>
+
+    <h3>Colours</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>röd</td><td>red</td><td></td></tr>
+      <tr><td>blo</td><td>blue</td><td>ljusblo = light blue</td></tr>
+      <tr><td>grön</td><td>green</td><td></td></tr>
+      <tr><td>gul</td><td>yellow</td><td></td></tr>
+      <tr><td>svart</td><td>black</td><td></td></tr>
+      <tr><td>hvit</td><td>white</td><td></td></tr>
+      <tr><td>grå</td><td>grey</td><td></td></tr>
+      <tr><td>brun</td><td>brown</td><td></td></tr>
+      <tr><td>purpur</td><td>purple</td><td></td></tr>
+      <tr><td>silver</td><td>silver</td><td></td></tr>
+      <tr><td>guld</td><td>gold</td><td></td></tr>
+    </table>
+
+    <h3>Metals &amp; materials</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>jarn</td><td>iron</td><td></td></tr>
+      <tr><td>stal</td><td>steel</td><td></td></tr>
+      <tr><td>koppar</td><td>copper</td><td></td></tr>
+      <tr><td>tenn</td><td>tin</td><td></td></tr>
+      <tr><td>bly</td><td>lead</td><td></td></tr>
+      <tr><td>brons</td><td>bronze</td><td></td></tr>
+      <tr><td>ved</td><td>wood</td><td></td></tr>
+      <tr><td>sten</td><td>stone</td><td></td></tr>
+      <tr><td>glas</td><td>glass</td><td></td></tr>
+      <tr><td>tyg</td><td>cloth</td><td></td></tr>
+      <tr><td>läder</td><td>leather</td><td></td></tr>
+      <tr><td>ben</td><td>bone</td><td></td></tr>
+      <tr><td>ler</td><td>clay</td><td></td></tr>
+      <tr><td>vax</td><td>wax</td><td></td></tr>
+      <tr><td>fjäder</td><td>feather</td><td></td></tr>
+      <tr><td>ull</td><td>wool</td><td></td></tr>
+    </table>
+
+    <h3>Emotions</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>kärlek</td><td>love</td><td></td></tr>
+      <tr><td>rädsla</td><td>fear</td><td></td></tr>
+      <tr><td>vrede</td><td>anger</td><td></td></tr>
+      <tr><td>sorg</td><td>sorrow</td><td></td></tr>
+      <tr><td>glädje</td><td>joy</td><td></td></tr>
+      <tr><td>längtan</td><td>longing</td><td></td></tr>
+      <tr><td>skam</td><td>shame</td><td></td></tr>
+      <tr><td>stolthet</td><td>pride</td><td></td></tr>
+      <tr><td>frid</td><td>peace</td><td></td></tr>
+      <tr><td>ensam</td><td>lonely</td><td></td></tr>
+      <tr><td>trygg</td><td>safe</td><td></td></tr>
+      <tr><td>trött</td><td>tired</td><td></td></tr>
+    </table>
+
+    <h3>Body &amp; pain</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>hjer</td><td>heart</td><td></td></tr>
+      <tr><td>sid</td><td>side</td><td></td></tr>
+      <tr><td>sår</td><td>wound</td><td></td></tr>
+      <tr><td>blod</td><td>blood</td><td></td></tr>
+      <tr><td>värk</td><td>ache</td><td></td></tr>
+      <tr><td>svullen</td><td>swollen</td><td></td></tr>
+      <tr><td>au</td><td>ow</td><td></td></tr>
+    </table>
+  </section>
+
+  <!-- ===== RACES ===== -->
+  <section id="races">
+    <h2>Races of Moonbloom</h2>
+    <p>Moonbloom is a kingdom where many races live side by side. Dragons are animals here, not a race — and hunting them is forbidden: <i>ne jaga drak</i>.</p>
+    <div class="grid">
+      <div><b>syren</b>mermaid</div>
+      <div><b>djupsyren</b>deep-sea mermaid</div>
+      <div><b>skogsyren</b>lake mermaid</div>
+      <div><b>kentaur</b>centaur</div>
+      <div><b>vampyr</b>vampire</div>
+      <div><b>ulvfolk</b>werewolf — "wolf-folk"</div>
+      <div><b>drak</b>dragon (animal)</div>
+      <div><b>ängel</b>angel</div>
+      <div><b>gud / gudinna</b>god / goddess</div>
+      <div><b>älva</b>elf</div>
+      <div><b>troll</b>troll</div>
+      <div><b>fe</b>fairy</div>
+      <div><b>chupryna</b>chupryna</div>
+      <div><b>dvärg</b>dwarf</div>
+      <div><b>jätte</b>giant</div>
+      <div><b>halvjätte</b>half-giant</div>
+      <div><b>gnom</b>gnome</div>
+      <div><b>kobold</b>kobold</div>
+      <div><b>nisse</b>house sprite</div>
+      <div><b>puck</b>forest trickster</div>
+      <div><b>hamnskift</b>shapeshifter</div>
+      <div><b>björnfolk</b>bear-folk</div>
+      <div><b>rävfolk</b>fox-folk (kitsune)</div>
+      <div><b>kattfolk</b>cat-folk</div>
+      <div><b>fågelfolk</b>bird-folk (harpy)</div>
+      <div><b>ormfolk</b>snake-folk (naga)</div>
+      <div><b>fiskfolk</b>fish-folk (merman)</div>
+      <div><b>stenfolk</b>stone-folk (gargoyle)</div>
+      <div><b>skogsande</b>forest spirit</div>
+      <div><b>vattenande</b>water spirit</div>
+      <div><b>eldande</b>fire spirit</div>
+      <div><b>vindande</b>wind spirit</div>
+      <div><b>skugga</b>shadow being</div>
+      <div><b>dimmfolk</b>mist-folk</div>
+      <div><b>frostfolk</b>frost-folk</div>
+      <div><b>halvdemon</b>half-demon</div>
+      <div><b>halvängel</b>half-angel (nephilim)</div>
+      <div><b>fallna</b>the fallen</div>
+      <div><b>banshee</b>banshee, a herald</div>
+      <div><b>dryad</b>dryad</div>
+      <div><b>satyr</b>satyr</div>
+      <div><b>minotaur</b>minotaur</div>
+      <div><b>sköldpaddsfolk</b>turtle-folk (kappas)</div>
+    </div>
+  </section>
+
+  <!-- ===== BATTLE CRIES ===== -->
+  <section id="cries">
+    <h2>Battle cries</h2>
+
+    <div class="cry signature">
+      <b>MI ES LUNARI — SAN ES STELARI! DRÄP SAN!</b>
+      <span>We are alive — they are things! Kill them!</span>
+    </div>
+
+    <div class="cry"><b>GIV SAN STAL, DRENGIN!</b><span>Give 'em steel, lads!</span></div>
+    <div class="cry"><b>DRIV SAN TIL HEL!</b><span>Drive them back to hell!</span></div>
+    <div class="cry"><b>GIV SAN HEL!</b><span>Give them hell!</span></div>
+    <div class="cry"><b>LÅT SAN SMAK STAL, DRENGIN!</b><span>Let them taste the steel, boys!</span></div>
+    <div class="cry"><b>DRÄP SAN!</b><span>Kill them!</span></div>
+    <div class="cry"><b>FRAM!</b><span>Forward
+
+<div class="cry"><b>VIS SAN OV VAT MIN ES!</b><span>Show them what we're made of!</span></div>
+    <div class="cry"><b>STAL TIL SAN, FYRA TIL SAN!</b><span>Steel to them, fire to them!</span></div>
+    <div class="cry"><b>NE EN FEN TILBAK!</b><span>Not one step back!</span></div>
+    <div class="cry"><b>SAN DÖR, MIN LEV!</b><span>They die, we live!</span></div>
+    <div class="cry"><b>BLOD FOR BLOM!</b><span>Blood for the bloom!</span></div>
+    <div class="cry"><b>JAG SAN!</b><span>Run them down!</span></div>
+    <div class="cry"><b>HOLD ORD!</b><span>Hold the line!</span></div>
+  </section>
+
+<p class="muted">I don't actually know what I was doing when I wrote these. I was just bored, honestly.</p>
+
+  <!-- ===== SWEARING ===== -->
+  <section id="swearing">
+    <h2>Swearing</h2>
+    <p class="muted">Fictional profanity, for my characters. Not aimed at anyone real.</p>
+
+    <h3>Mild</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>fan</td><td>damn it</td><td>the everyday one, slips out when you trip</td></tr>
+      <tr><td>hel</td><td>hell</td><td></td></tr>
+      <tr><td>skit</td><td>shit</td><td></td></tr>
+      <tr><td>djävul</td><td>devil</td><td></td></tr>
+      <tr><td>förbannad</td><td>cursed</td><td></td></tr>
+      <tr><td>dum</td><td>stupid</td><td></td></tr>
+      <tr><td>idiot</td><td>idiot</td><td></td></tr>
+    </table>
+
+    <h3>Stronger</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>dra til hel</td><td>go to hell</td><td></td></tr>
+      <tr><td>skit i det</td><td>screw it</td><td>literally "shit in it"</td></tr>
+      <tr><td>för helvete</td><td>for hell's sake</td><td></td></tr>
+      <tr><td>helvetes</td><td>damn, bloody</td><td>adjective: helvetes drak</td></tr>
+      <tr><td>din jävel</td><td>you bastard</td><td></td></tr>
+      <tr><td>djävla</td><td>fucking, damn</td><td></td></tr>
+    </table>
+
+    <h3>Very strong</h3>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th><th>Notes</th></tr>
+      <tr><td>FYRA OV HEL!</td><td>hellfire!</td><td></td></tr>
+      <tr><td>NE VÄRD EN ORD!</td><td>not worth a word!</td><td></td></tr>
+    </table>
+
+    <h3>The Polish ones</h3>
+    <table>
+      <tr><th>Polish</th><th>Moonbloom</th><th>Notes</th></tr>
+      <tr><td>kurwa</td><td>fan / hora</td><td>fan as a filler, hora as an insult</td></tr>
+      <tr><td>suka</td><td>tik</td><td>short and spat out</td></tr>
+      <tr><td>dziwka</td><td>sköka</td><td>older, uglier word</td></tr>
+      <tr><td>pierdolę</td><td>skit i det</td><td>stronger: fan ta det</td></tr>
+      <tr><td>jebać</td><td>knulla</td><td>for "screw it" use skit i det</td></tr>
+    </table>
+
+    <div class="card">
+      <div class="example">Fan, mi ne sova. — Damn, I don't know.</div>
+      <div class="example">Ti tik! — You bitch!</div>
+      <div class="example">Skit i det, mi fen. — Screw it, I'm going.</div>
+      <div class="example">Fan, fan, fan… sid mi… au. — Fuck, fuck, fuck… my side… ow.</div>
+    </div>
+  </section>
+
+  <!-- ===== SENTENCES ===== -->
+  <section id="sentences">
+    <h2>Sentences</h2>
+    <table>
+      <tr><th>Moonbloom</th><th>English</th></tr>
+      <tr><td>Mi ami ti, lunari.</td><td>I love you, living one.</td></tr>
+      <tr><td>Ka ti mjn fen heim?</td><td>Do you want to go home?</td></tr>
+      <tr><td>San ne es stelari, san es lunari.</td><td>They are not things, they are alive.</td></tr>
+      <tr><td>Min runa in Moonbloom.</td><td>We live in Moonbloom.</td></tr>
+      <tr><td>Sa es mör, te hjer sa es varm.</td><td>He is big, but his heart is warm.</td></tr>
+      <tr><td>Ka ti sova san ord?</td><td>Do you know their words?</td></tr>
+      <tr><td>Mi va tal med ti, lunari mi.</td><td>I will speak with you, my living one.</td></tr>
+      <tr><td>Mi hjer es full ov längtan.</td><td>My heart is full of longing.</td></tr>
+      <tr><td>Sa hjer es svart, te ord sa es guld.</td><td>His heart is black, but his words are gold.</td></tr>s
+      <tr><td>Ne jaga drak — drak es lunari, ne stelari.</td><td>Don't hunt dragons — a dragon is alive, not a thing.</td></tr>
+      <tr><td>Stal kald in heim mi.</td><td>Cold steel in my house.</td></tr>
+      <tr><td>In Moonbloom runa syrenin, kentaurin, vampyrin, älvin, trollin — ve drakin.</td><td>In Moonbloom live mermaids, centaurs, vampires, elves, trolls — and dragons.</td></tr>
+    </table>
+  </section>
+
+
+<script>
+  const rows = document.querySelectorAll('table tr');
+
+  document.getElementById('search').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+
+    rows.forEach(function (row) {
+      if (row.querySelector('th')) return;
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+</script>  
+</main>
+
+<footer>
+  Made by Vix. Moonbloom is mine — the language, the kingdom, all of it. wait for ubdates!!
+</footer>
+
+</script>
+
+</body>
+</html>
+
